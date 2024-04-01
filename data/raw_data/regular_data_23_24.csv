@@ -1,0 +1,21 @@
+Rk,Squad,MP,W,D,L,GF,GA,GD,Pts,Pts/MP,xG,xGA,xGD,xGD/90,Last 5,Attendance,Top Team Scorer,Goalkeeper,Notes
+1,Liverpool,29,20,7,2,67,27,40,67,2.31,65.3,34.9,30.4,1.05,W W W D W,"54,888",Mohamed Salah - 16,Alisson,
+2,Arsenal,29,20,5,4,70,24,46,65,2.24,57.3,20.4,36.8,1.27,W W W W D,"60,213",Bukayo Saka - 13,David Raya,
+3,Manchester City,29,19,7,3,63,28,35,64,2.21,57.6,28.2,29.4,1.01,W W W D D,"49,463",Erling Haaland - 18,Ederson,
+4,Aston Villa,30,18,5,7,62,42,20,59,1.97,52.7,43.3,9.3,0.31,W W L D W,"38,918",Ollie Watkins - 16,Emiliano Martínez,
+5,Tottenham,29,17,5,7,61,43,18,56,1.93,52.3,47,5.3,0.18,L W W L W,"61,553",Son Heung-min - 15,Guglielmo Vicario,
+6,Manchester Utd,29,15,3,11,40,40,0,48,1.66,43.8,50.7,-6.8,-0.24,W L L W D,"73,523","Marcus Rashford, Scott McTominay... - 7",André Onana,
+7,West Ham,30,12,8,10,49,54,-5,44,1.47,42.4,55,-12.6,-0.42,W W D D L,"62,594",Jarrod Bowen - 15,Alphonse Areola,
+8,Newcastle Utd,29,13,4,12,63,51,12,43,1.48,55.2,50.6,4.6,0.16,D L W L W,"52,126",Alexander Isak - 14,Martin Dúbravka,
+9,Brighton,29,11,9,9,51,46,5,42,1.45,45.9,41.5,4.5,0.15,W D L W L,"33,003",João Pedro - 8,Jason Steele,
+10,Wolves,29,12,5,12,42,46,-4,41,1.41,39.1,48.9,-9.8,-0.34,W W L W L,"31,280",Hwang Hee-chan - 10,José Sá,
+11,Chelsea,28,11,7,10,49,47,2,40,1.43,54.3,41.9,12.4,0.44,W D D W D,"39,554",Cole Palmer - 13,Robert Sánchez,
+12,Fulham,30,11,6,13,46,47,-1,39,1.3,40.5,51.7,-11.2,-0.37,W W L W D,"24,290",Rodrigo Muniz - 8,Bernd Leno,
+13,Bournemouth,29,10,8,11,43,53,-10,38,1.31,43.9,45.9,-2,-0.07,L W D W W,"11,089",Dominic Solanke - 16,Neto,
+14,Crystal Palace,29,7,9,13,34,49,-15,30,1.03,34.3,40.8,-6.6,-0.23,D W L D D,"24,861","Odsonne Édouard, Jean-Philippe Mateta... - 6",Sam Johnstone,
+15,Brentford,30,7,6,17,42,55,-13,27,0.9,48.3,45.8,2.5,0.08,L D L L D,"17,081","Yoane Wissa, Bryan Mbeumo - 7",Mark Flekken,
+16,Everton,29,8,7,14,30,41,-11,25,0.86,43.4,41.1,2.3,0.08,D D L L L,"39,063",Abdoulaye Doucouré - 6,Jordan Pickford,6-point deduction 1
+17,Nott'ham Forest,30,6,8,16,36,52,-16,22,0.73,37.4,43.1,-5.6,-0.19,L L L D D,"29,356",Chris Wood - 10,Matt Turner,4-point deduction 2
+18,Luton Town,30,5,7,18,43,62,-19,22,0.73,35.8,62.6,-26.8,-0.89,L D L D L,"11,065",Elijah Adebayo - 9,Thomas Kaminski,
+19,Burnley,30,4,6,20,31,65,-34,18,0.6,30,54.7,-24.7,-0.82,L L D W D,"21,159","Lyle Foster, Zeki Amdouni... - 4",James Trafford,
+20,Sheffield Utd,29,3,6,20,27,77,-50,15,0.52,27,58.4,-31.3,-1.08,L L L D D,"30,332",Oliver McBurnie - 5,Wes Foderingham,
