@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Model EPL points using Bayesian linear regression.
+# Purpose: Model EPL points and wins using Bayesian linear regression.
 # Author: Jiwon Choi
 # Date: 1 April 2024
 # Contact: jwon.choi@mail.utoronto.ca
@@ -62,7 +62,7 @@ saveRDS(
 
 saveRDS(
   ordered_teams_pts,
-  file = "models/prediction_ptsrds"
+  file = "models/prediction_pts.rds"
 )
 
 saveRDS(
