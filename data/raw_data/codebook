@@ -1,0 +1,198 @@
+---- Regular data ----
+1) Rk -- Rank
+Squad finish in competition
+Finish within the league or competition.
+For knockout competitions may show final round reached.
+Colors and arrows represent promotion/relegation or qualifiation for continental cups.
+Trophy indicates team won league whether by playoffs or by leading the table.
+Star indicates topped table in league USING another means of naming champion.
+
+2) MP -- Matches Played
+Matches Played by the player or squad
+
+3) W -- Wins
+Wins
+
+4) D -- Draws
+Draws
+
+5) L -- Losses
+Losses
+
+6) GF -- Goals For
+Goals For
+
+7) GA -- Goals Against
+Goals Against
+
+8) GD -- Goal Difference
+Goal Difference
+
+9) Pts -- Points
+Most leagues are ordered by points.
+Three for a win and one for a draw.
+
+10) Pts/MP -- Points/Match
+Points per Match Played
+
+11) xG -- Expected Goals
+xG totals include penalty kicks, but do not include penalty shootouts (unless otherwise noted).
+Provided by Opta.
+An underline indicates there is a match that is missing data, but will be updated when available.
+
+12) xGA -- xG Allowed
+Expected Goals Allowed
+xG totals include penalty kicks, but do not include penalty shootouts (unless otherwise noted).
+Provided by Opta.
+An underline indicates there is a match that is missing data, but will be updated when available.
+
+13)xGD -- xG Difference
+Expected Goals Difference
+xG totals include penalty kicks, but do not include penalty shootouts (unless otherwise noted).
+Provided by Opta.
+An underline indicates there is a match that is missing data, but will be updated when available.
+
+14) xGD/90 -- xG Difference/90
+Expected Goals Difference per 90 Minutes
+xG totals include penalty kicks, but do not include penalty shootouts (unless otherwise noted).
+Provided by Opta.
+An underline indicates there is a match that is missing data, but will be updated when available.
+
+15) Last 5 -- Last Five Matches
+Matches are ordered chronologically from left-to-right
+
+16)Attendance -- Attendance/Game
+Attendance per game during this season, only for home matches
+
+17) Top Team Scorer -- Only includes league matches for that season
+
+18) Goalkeeper -- Goalkeeper with the most minutes in league play
+
+
+---- Squad data ----
+1) # Pl -- # of Players
+Number of Players used in Games
+
+2) Age -- Average Age
+Age is weighted by minutes played
+
+3) Poss -- Possession
+Possession
+Calculated as the percentage of passes attempted
+
+Playing Time
+  4) MP -- Matches Played
+    Matches Played by the player or squad
+  5) Starts -- Game or games started by player
+  6) Min -- Minutes
+  7) 90s -- 90s Played
+  8) 90s played
+    Minutes played divided by 90
+
+Performance
+  9) Gls -- Goals
+    Goals scored or allowed
+  10) Ast -- Assists
+    Assists
+  11) G+A -- Goals + Assists
+    Goals and Assists
+  12) G-PK -- Non-Penalty Goals
+    Non-Penalty Goals
+  13) PK -- Penalty Kicks Made
+    Penalty Kicks Made
+  14) PKatt -- Penalty Kicks Attempted
+    Penalty Kicks Attempted
+  15) CrdY -- Yellow Cards
+    Yellow Cards
+  16) CrdR -- Red Cards
+    Red Cards
+    
+Expected
+  17) xG -- xG: Expected Goals
+    Expected Goals
+    xG totals include penalty kicks, but do not include penalty shootouts
+    (unless otherwise noted).
+    Provided by Opta.
+    An underline indicates there is a match that is missing data,
+    but will be updated when available.
+  18) npxG -- npxG: Non-Penalty xG
+    Non-Penalty Expected Goals
+    Provided by Opta.
+    An underline indicates there is a match that is missing data, 
+    but will be updated when available.
+  19) xAG -- xAG: Exp. Assisted Goals
+    Expected Assisted Goals
+    xG which follows a pass that assists a shot
+    Provided by Opta.
+    An underline indicates there is a match that is missing data, 
+    but will be updated when available.
+  20) npxG+xAG -- npxG + xAG
+    Non-Penalty Expected Goals plus Assisted Goals
+    xG totals include penalty kicks, but do not include penalty shootouts 
+    (unless otherwise noted).
+    Provided by Opta.
+    An underline indicates there is a match that is missing data, 
+    but will be updated when available.
+    Minimum 30 minutes played per squad game to qualify as a leader
+    
+Progression
+  21) PrgC -- Progressive Carries
+    Carries that move the ball towards the opponent's goal line at least 10 yards from 
+    its furthest point in the last six passes, or any carry into the penalty area. 
+    Excludes carries which end in the defending 50% of the pitch
+  22) PrgP -- Progressive Passes
+    Progressive Passes
+    Completed passes that move the ball towards the opponent's goal line at least 10 yards
+    from its furthest point in the last six passes, or any completed pass 
+    into the penalty area. Excludes passes from the defending 40% of the pitch
+    
+Per 90 Minutes
+  23) Gls -- Goals/90
+    Goals Scored per 90 minutes
+    Minimum 30 minutes played per squad game to qualify as a leader
+  24) Ast -- Assists/90
+    Assists per 90 minutes
+    Minimum 30 minutes played per squad game to qualify as a leader
+  25) G+A -- Goals + Assists/90
+    Goals and Assists per 90 minutes
+    Minimum 30 minutes played per squad game to qualify as a leader
+  26) G-PK -- Non-Penalty Goals/90
+    Goals minus Penalty Kicks made per 90 minutes
+    Minimum 30 minutes played per squad game to qualify as a leader
+  27) G+A-PK -- Non-Penalty Goals + Assists/90
+    Goals plus Assists minus Penalty Kicks made per 90 minutes
+    Minimum 30 minutes played per squad game to qualify as a leader
+  28) xG -- xG/90
+    Expected Goals per 90 minutes
+    xG totals include penalty kicks, but do not include penalty shootouts
+    (unless otherwise noted).
+    Provided by Opta.
+    An underline indicates there is a match that is missing data, 
+    but will be updated when available.
+    Minimum 30 minutes played per squad game to qualify as a leader
+  29) xAG -- xAG/90
+    Expected Assisted Goals per 90 minutes
+    Provided by Opta.
+    An underline indicates there is a match that is missing data, 
+    but will be updated when available.
+    Minimum 30 minutes played per squad game to qualify as a leader
+  30) xG+xAG -- xG + xAG/90
+    Expected Goals plus Assisted Goals per 90 minutes
+    xG totals include penalty kicks, but do not include penalty shootouts
+    (unless otherwise noted).
+    Provided by Opta.
+    An underline indicates there is a match that is missing data,
+    but will be updated when available.
+    Minimum 30 minutes played per squad game to qualify as a leader
+  31) npxG -- npxG/90
+    Non-Penalty Expected Goals per 90 minutes
+    Provided by Opta.
+    An underline indicates there is a match that is missing data,
+    but will be updated when available.
+    Minimum 30 minutes played per squad game to qualify as a leader
+  32) npxG+xAG -- npxG + xAG
+    Non-Penalty Expected Goals plus Assisted Goals per 90 minutes
+    Provided by Opta.
+    An underline indicates there is a match that is missing data,
+    but will be updated when available.
+    Minimum 30 minutes played per squad game to qualify as a leader
