@@ -4,7 +4,7 @@
 # Date: 1 April 2024
 # Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: 01-download_data_test.R, 01-download_data-training.R, 02-data_ceaning-test.R, 02-data_cleaning-training.R
+# Pre-requisites: 01-download_data.R, 02-data_ceaning.R
 
 #### Workspace setup ####
 library(tidyverse)
@@ -24,7 +24,7 @@ all(data_23_24$Pts >= 0 & data_23_24$Pts <= 114)
 all(str_detect(data_17_23$season, "^[0-9]{2}/[0-9]{2}$"))
 
 # Check for numeric columns to ensure they are of correct types
-numeric_columns <- c("Rk", "W", "D", "L", "Pts", "Pts.MP", "Poss", "Gls", "CrdY", "CrdR", "xG", "PrgC", "PrgP")
+numeric_columns <- c("Rk", "W", "D", "L", "Pts", "Pts.MP", "Poss", "Gls", "xG", "PrgC", "PrgP")
 all(sapply(data_17_23[numeric_columns], is.numeric))
 all(sapply(data_23_24[numeric_columns], is.numeric))
 

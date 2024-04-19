@@ -1,11 +1,10 @@
 #### Preamble ####
-# Purpose: Cleans the raw plane data recorded by two observers..... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 6 April 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Cleans the raw plane data
+# Author: Jiwon Choi
+# Date: 1 April 2024
+# Contact: jwon.choi@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: 01-download_data.R
 
 #### Workspace setup ####
 library(tidyverse)
@@ -43,30 +42,30 @@ squad_data_17_18 <- squad_data_17_18[-1, ]
 
 # Now, to filter out only the specific columns you mentioned earlier
 filtered_data_23_24 <- squad_data_23_24 %>% 
-  select('Squad', 'Poss', 'Gls', 'CrdY', 'CrdR', 'xG', 'PrgC', 'PrgP')
+  select('Squad', 'Poss', 'Gls', 'xG', 'PrgC', 'PrgP')
 
 filtered_data_22_23 <- squad_data_22_23 %>% 
-  select('Squad', 'Poss', 'Gls', 'CrdY', 'CrdR', 'xG', 'PrgC', 'PrgP')
+  select('Squad', 'Poss', 'Gls', 'xG', 'PrgC', 'PrgP')
 filtered_data_22_23$season <- "22/23"
 
 filtered_data_21_22 <- squad_data_21_22 %>% 
-  select('Squad', 'Poss', 'Gls', 'CrdY', 'CrdR', 'xG', 'PrgC', 'PrgP')
+  select('Squad', 'Poss', 'Gls', 'xG', 'PrgC', 'PrgP')
 filtered_data_21_22$season <- "21/22"
 
 filtered_data_20_21 <- squad_data_20_21 %>% 
-  select('Squad', 'Poss', 'Gls', 'CrdY', 'CrdR', 'xG', 'PrgC', 'PrgP')
-filtered_data_20_21$season <- "21/20"
+  select('Squad', 'Poss', 'Gls', 'xG', 'PrgC', 'PrgP')
+filtered_data_20_21$season <- "20/21"
 
 filtered_data_19_20 <- squad_data_19_20 %>% 
-  select('Squad', 'Poss', 'Gls', 'CrdY', 'CrdR', 'xG', 'PrgC', 'PrgP')
+  select('Squad', 'Poss', 'Gls', 'xG', 'PrgC', 'PrgP')
 filtered_data_19_20$season <- "19/20"
 
 filtered_data_18_19 <- squad_data_18_19 %>% 
-  select('Squad', 'Poss', 'Gls', 'CrdY', 'CrdR', 'xG', 'PrgC', 'PrgP')
+  select('Squad', 'Poss', 'Gls', 'xG', 'PrgC', 'PrgP')
 filtered_data_18_19$season <- "18/19"
 
 filtered_data_17_18 <- squad_data_17_18 %>% 
-  select('Squad', 'Poss', 'Gls', 'CrdY', 'CrdR', 'xG', 'PrgC', 'PrgP')
+  select('Squad', 'Poss', 'Gls', 'xG', 'PrgC', 'PrgP')
 filtered_data_17_18$season <- "17/18"
 
 # For adding variables ('rk', 'W', 'D', 'L', 'Pts', 'Pts/MP') from regular_data
