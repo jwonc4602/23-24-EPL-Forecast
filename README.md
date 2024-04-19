@@ -1,6 +1,6 @@
 ## Overview
 
-This repo contains the data, code, analysis, and prediction of the English Premier League (EPL) 2023/2024 season by Jiwon Choi.
+This repo contains the data, code, analysis, and prediction of the English Premier League (EPL) 2023/2024 season by Jiwon Choi. Parquet file was not able to be used due to unresolved technical issues. 
 
 ## File Structure
 
@@ -16,3 +16,4 @@ The repo is structured as:
 ## Statement on LLM usage
 
 No LLMs were used. 
+
