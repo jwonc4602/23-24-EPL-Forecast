@@ -18,11 +18,9 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
-library(palmerpenguins)
 library(here)
 library(ggplot2)
 library(knitr)
-library(gridExtra)
 library(kableExtra)
 
 #### Read in necessary data and model ####
@@ -214,7 +212,7 @@ ggplot(cleaned_data_17_23, aes(x = xG, y = Gls, size = Poss, color = Poss)) +
   geom_point(alpha = 0.6) +
   scale_size_continuous(range = c(1, 20)) +
   scale_color_gradient(low = "blue", high = "red") + # Use a gradient from blue to red
-  labs(title = "Bubble Chart of Goals vs Expected Goals",
+  labs(title = "Goals vs Expected Goals",
        x = "Expected Goals",
        y = "Goals",
        size = "Possession (%)",
@@ -379,7 +377,7 @@ ggplot(past_season_data, aes(x = Pts, y = PredictedPts)) +
   geom_smooth(method = "lm", se = FALSE, color = "blue", linetype = "dashed") +
   labs(x = "Actual Points",
        y = "Predicted Points",
-       title = "Predicted vs. Actual Points Scatter Plot",
+       title = "Predicted vs. Actual Points",
        subtitle = "Each point represents a team's season") +
   theme_minimal() +
   scale_color_viridis_d(name = "Team")
@@ -426,7 +424,7 @@ ggplot(long_data, aes(x = season, y = Points, group = Squad, color = Type)) +
   facet_wrap(~Squad) +
   labs(x = "Season",
        y = "Points",
-       title = "Time Series of Predicted vs. Actual Points by Team",
+       title = "Predicted vs. Actual Points by Team",
        subtitle = "Comparison across multiple seasons for Liverpool, Manchester City, and Arsenal") +
   theme_minimal() +
   scale_color_brewer(palette = "Set1", name = "Data Type")
