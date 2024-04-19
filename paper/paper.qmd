@@ -1,13 +1,12 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "Can Jürgen Klopp Finish His Liverpool Career with the 2023/2024 EPL Title?"
+subtitle: "Analyzing Possession, Goals, Expected Goals, Progressive Passes, and Progressive Carries to Forecast Winning Points in Soccer"
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: LINK."
+  - Jiwon Choi
+thanks: "Code and data are available at: https://github.com/jwonc4602/23-24-EPL-Forecast."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This study develops a Bayesian regression model to predict English Premier League standings by analyzing how team performance metrics such as possession percentages, goals scored, expected goals, progressive passes, and progressive carries influence league points. The findings indicate that goals scored and expected goals are the most significant predictors of team success, providing a quantitative basis for strategic planning in football. The results demonstrate the potential of using advanced statistical methods to enhance the predictability of sports outcomes, offering valuable insights for team management and sports analysts. By quantifying the impact of specific performance metrics, this research contributes to a deeper understanding of football dynamics and emphasizes the importance of data-driven decision-making in professional sports."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -20,198 +19,448 @@ bibliography: references.bib
 
 library(tidyverse)
 library(palmerpenguins)
+library(here)
+library(ggplot2)
+library(knitr)
+library(gridExtra)
+library(kableExtra)
+
+#### Read in necessary data and model ####
+cleaned_data_17_23 <-read_csv(file = here("data/analysis_data/cleaned_data_17_23.csv"), show_col_types = FALSE)
+cleaned_data_23_24 <- read_csv(file = here("data/analysis_data/cleaned_Data_23_24.csv"), show_col_types = FALSE)
+model_by_pts <- readRDS(file = here("models/model_pts.rds"))
+prediction_by_pts <- readRDS(file = here("models/prediction_pts.rds"))
 ```
 
 
 # Introduction
+After Klopp announced that he would leave Liverpool [@LiverpoolFC2024], all the soccer fans were spotlighting if his Liverpool would win the league. However, the English Premier League (EPL) is one of the most unpredictable and competitive football leagues globally. This unpredictability, while adding excitement for fans, presents challenges in predictive analytics. In sports analytics, accurately forecasting outcomes such as league standings or match results can significantly benefit team management, betting markets, and strategic fan engagement. However, a notable gap persists in the literature—quantitatively linking team performance metrics to actual league outcomes. This paper addresses this gap by focusing on estimating the impact of specific performance metrics on league points, thus improving the predictability of team standings.
 
-You can and should cross-reference sections and sub-sections. We use @citeR and @rohan.
+Our study constructs a Bayesian regression model to estimate how key performance indicators—such as possession percentages, goals scored, expected goals, progressive passes, and progressive carries—correlate with league points accumulated over a season. The primary estimand in our analysis is the set of coefficients for these metrics in the regression model, which quantifies their respective contributions to the total points earned by teams in the EPL.
 
-The remainder of this paper is structured as follows. @sec-data....
+The results demonstrate that certain metrics, notably goals scored and expected goals, have a significant predictive relationship with league standings. This finding is instrumental for teams in prioritizing aspects of gameplay that are statistically proven to correlate with success. Moreover, these insights offer tactical and strategic directions for team management, focusing on measurable performance areas that directly contribute to league success.
 
-
+The paper is methodically structured to enhance understanding and facilitate further analysis. @sec-data then discusses specifics of the data sources and the variables that were considered important for this study. @sec-model introduces the specifics of our Bayesian regression model. This is followed by the presentation of the results in @sec-result, which details the statistical significance and predictive power of the identified performance metrics. We conclude with a discussion of our findings and their implications for team strategy and future research in @sec-discussion. Through this structured approach, the study provides insights that significantly contribute to the field of sports analytics, offering strong methods for predicting football performance and informing strategic decisions.
 
 # Data {#sec-data}
+This study utilized two distinct datasets from FBref.com [@FBref], retrieved through web scraping with the rvest package [@rvest]. The datasets comprise seasonal performance statistics and squad-specific data across various seasons. The analysis focuses on data spanning from the 2017/2018 season to the 2022/2023 season to develop a predictive model for the 2023/2024 season's winner. The regular dataset includes general metrics such as matches played, wins, draws, and losses for each club, while the squad dataset provides detailed metrics including possession rates (Poss) and expected goal rates (xG) for each team. Initially, a decade's worth of data was considered for model development; however, the key variables required for this study were only available starting from the 2017/2018 season, thus limiting the analysis to the last six seasons. The data compilation and analysis were conducted using the R statistical programming language [@citeR], supplemented by packages such as tidyverse [@tidyverse], rstanarm [@rstanarm], knitr [@knitr], here [@here], ggplot [@ggplot] among others, to support the analysis.
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+## Regular Season Data
+The dataset for the regular football season provides detailed data across various seasons, including team rankings (Rk), total matches played (MP), wins (W), draws (D), losses (L), home game attendance (Attendance), and the top team scorer. For analysis, the variables selected were 'Squad', 'Rk', 'W', 'D', 'L', 'Pts', and 'Pts.MP'. The 'Pts' denotes the total points accumulated in a season, while 'Pts.MP' calculates the average points earned per match, with all variables specific to each squad. In football leagues, a win awards a team three points, a draw one point, and a loss yields no points. The team with the highest points at the season's end is crowned the champion. Additionally, a 'season' was included to specify the data range from the 2017/2018 season to the 2022/2023 season. (See @tbl-cleaned-regular-data)
 
 ```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
 #| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-cleaned-regular-data
+#| tbl-cap: Sample of Cleaned Regular Season Data
+cleaned_regular_data <- cleaned_data_17_23
+selected_columns <- c(1:7, 13)
+kable(head(cleaned_regular_data[, selected_columns], 5), format = "latex", booktabs = TRUE, align = "c")
+```
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
+@fig-ranking-over-previous-seasons shows the fluctuating rankings of the three title-contending teams over the past seasons. Manchester City has dominated the EPL, achieving the title in five seasons, except for the 2019/2020 season when Liverpool emerged victorious: their consistent performance and last season's treble highlight Manchester City as a formidable contender [@ManCity2023Treble]. Meanwhile, Arsenal, after not winning since the 2003/2004 season [@ArsenalLastWin], has shown significant improvement since the 2020/2021 season, positioning themselves as competitive challengers for the title.
+
+```{r fig.width=10, fig.height=5}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-ranking-over-previous-seasons
+#| fig-cap: Ranking over Previous Seasons for Top Three Team
+# Load the dataset
+df <- cleaned_data_17_23 # Make sure the path to your CSV file is correct
+
+# Filter the data for the three teams you want to plot
+df_filtered <- df[df$Squad %in% c('Liverpool', 'Arsenal', 'Manchester City'),]
+
+# Specify the order of the seasons directly
+season_order <- c('17/18', '18/19', '19/20', '20/21', '21/22', '22/23')
+
+# Convert the season to a factor with the levels in the desired order
+df_filtered$season <- factor(df_filtered$season, levels = season_order)
+
+# Plot using ggplot2
+ggplot(data = df_filtered, aes(x = season, y = Rk, group = Squad, color = Squad)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 4, linetype = "dashed", color = "grey", size = 0.5) + # Add a dashed horizontal line at rank 4
+  scale_y_reverse(breaks = seq(1, max(df_filtered$Rk, na.rm = TRUE), by = 1)) + # Invert the y-axis with proper breaks
   theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+  labs(title = "Ranking over Previous Seasons", x = "Season", y = "Rank", color = "Team") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate the x labels
+
 ```
 
-Talk more about it.
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-liverpool-previous-season-winning-points
+#| tbl-cap: Winning Points over Previous Season for Liverpool
 
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+# Filter the dataset for Liverpool
+liverpool_df <- cleaned_data_17_23[cleaned_data_17_23$Squad == "Liverpool",]
+
+# Calculate the total matches played
+liverpool_df$Total_Matches <- liverpool_df$W + liverpool_df$D + liverpool_df$L
+
+# Format the W/D/L with percentages
+liverpool_df$Wins <- paste(liverpool_df$W, "(", sprintf("%.1f%%", liverpool_df$W / liverpool_df$Total_Matches * 100), ")", sep="")
+liverpool_df$Draws <- paste(liverpool_df$D, "(", sprintf("%.1f%%", liverpool_df$D / liverpool_df$Total_Matches * 100), ")", sep="")
+liverpool_df$Losses <- paste(liverpool_df$L, "(", sprintf("%.1f%%", liverpool_df$L / liverpool_df$Total_Matches * 100), ")", sep="")
+
+# Specify the order of the seasons directly
+season_order <- c('17/18', '18/19', '19/20', '20/21', '21/22', '22/23')
+
+# Convert the season to a factor with the levels in the desired order
+liverpool_df$season <- factor(liverpool_df$season, levels = season_order)
+
+# Select only the necessary columns and arrange the data by season
+liverpool_results_ordered <- liverpool_df[order(liverpool_df$season), c('season', 'Wins', 'Draws', 'Losses', 'Pts', 'Pts.MP', 'Rk')]
+
+kable(liverpool_results_ordered, "latex", booktabs = TRUE) %>%
+  kable_styling(font_size = 12)
+```
 
 ```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
 #| echo: false
-#| warning: false
 #| message: false
+#| warning: false
+#| label: tbl-mancity-previous-season-winning-points
+#| tbl-cap: Winning Points over Previous Season for Manchester City
 
-analysis_data <- read_csv(here::here("data/analysis_data/analysis_data.csv"))
+# Read your data from the CSV file
+df <- cleaned_data_17_23
 
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
+# Filter the dataset for Liverpool
+mancity_df <- df[df$Squad == "Manchester City",]
+
+# Calculate the total matches played
+mancity_df$Total_Matches <- mancity_df$W + mancity_df$D + mancity_df$L
+
+# Format the W/D/L with percentages
+mancity_df$Wins <- paste(mancity_df$W, "(", sprintf("%.1f%%", mancity_df$W / mancity_df$Total_Matches * 100), ")", sep="")
+mancity_df$Draws <- paste(mancity_df$D, "(", sprintf("%.1f%%", mancity_df$D / mancity_df$Total_Matches * 100), ")", sep="")
+mancity_df$Losses <- paste(mancity_df$L, "(", sprintf("%.1f%%", mancity_df$L / mancity_df$Total_Matches * 100), ")", sep="")
+
+# Specify the order of the seasons directly
+season_order <- c('17/18', '18/19', '19/20', '20/21', '21/22', '22/23')
+
+# Convert the season to a factor with the levels in the desired order
+mancity_df$season <- factor(mancity_df$season, levels = season_order)
+
+# Select only the necessary columns
+mancity_results_ordered <- mancity_df[, c('season', 'Wins', 'Draws', 'Losses', 'Pts', 'Pts.MP', 'Rk')]
+
+# Arrange the data by season
+mancity_results_ordered <- mancity_results_ordered[order(mancity_results_ordered$season),]
+
+kable(mancity_results_ordered, "latex", booktabs = TRUE) %>%
+  kable_styling(font_size = 12)
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-arsenal-previous-season-winning-points
+#| tbl-cap: Winning Points over Previous Season for Arsenal
+
+# Read your data from the CSV file
+df <- cleaned_data_17_23
+
+# Filter the dataset for Liverpool
+arsenal_df <- df[df$Squad == "Arsenal",]
+
+# Calculate the total matches played
+arsenal_df$Total_Matches <- arsenal_df$W + arsenal_df$D + arsenal_df$L
+
+# Format the W/D/L with percentages
+arsenal_df$Wins <- paste(arsenal_df$W, "(", sprintf("%.1f%%", arsenal_df$W / arsenal_df$Total_Matches * 100), ")", sep="")
+arsenal_df$Draws <- paste(arsenal_df$D, "(", sprintf("%.1f%%", arsenal_df$D / arsenal_df$Total_Matches * 100), ")", sep="")
+arsenal_df$Losses <- paste(arsenal_df$L, "(", sprintf("%.1f%%", arsenal_df$L / arsenal_df$Total_Matches * 100), ")", sep="")
+
+# Specify the order of the seasons directly
+season_order <- c('17/18', '18/19', '19/20', '20/21', '21/22', '22/23')
+
+# Convert the season to a factor with the levels in the desired order
+arsenal_df$season <- factor(arsenal_df$season, levels = season_order)
+
+# Select only the necessary columns
+arsenal_results_ordered <- arsenal_df[, c('season', 'Wins', 'Draws', 'Losses', 'Pts', 'Pts.MP', 'Rk')]
+
+# Arrange the data by season
+arsenal_results_ordered <- arsenal_results_ordered[order(arsenal_results_ordered$season),]
+
+kable(arsenal_results_ordered, "latex", booktabs = TRUE) %>%
+  kable_styling(font_size = 12)
+```
+
+@tbl-liverpool-previous-season-winning-points, @tbl-mancity-previous-season-winning-points, and @tbl-arsenal-previous-season-winning-points show each team's performance metrics, including wins, losses, draws, total points, points per match played and rankings. Especially, the 2018/2019 season illustrates this, with Liverpool finishing second with 1 loss and 30 wins despite an impressive record, due to Manchester City's 4 losses and 32 wins. Manchester City clinched the league by just one point, emphasizing that targeting victories, to secure the big winning point of 3, is more strategic than merely avoiding defeats for optimizing point accumulation.
+
+## Squad Standard Stats Data
+The Squad Standard Stats Data encompasses a range of metrics assessing team performance, including playing time, possession, and goals. For this analysis, the key metrics selected are 'Possession' (Poss), 'Goals' (Gls), 'Expected Goals' (xG), 'Progressive Carries' (PrgC), and 'Progressive Passes' (PrgP). These variables are important in evaluating the overall quality of a squad and predicting match outcomes.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-relation-between-goals-and-poss
+#| fig-cap: Goals vs Expected Goals with Possession over Previous Seasons
+
+# Bubble chart with color gradient based on 'Possession'
+ggplot(cleaned_data_17_23, aes(x = xG, y = Gls, size = Poss, color = Poss)) +
+  geom_point(alpha = 0.6) +
+  scale_size_continuous(range = c(1, 20)) +
+  scale_color_gradient(low = "blue", high = "red") + # Use a gradient from blue to red
+  labs(title = "Bubble Chart of Goals vs Expected Goals",
+       x = "Expected Goals",
+       y = "Goals",
+       size = "Possession (%)",
+       color = "Possession (%)") +
+  theme_minimal()
+```
+
+@fig-relation-between-goals-and-poss clearly shows that Possession (Poss) continues to be an important metric. Despite a shift in some modern tactics that de-emphasize possession, maintaining control over the ball generally increases a team's opportunities to score. The relationship between 'Goals' (Gls) and 'Expected Goals' (xG) is particularly telling. Expected Goals (xG) quantifies the quality of a scoring chance based on the likelihood of a shot being scored from a similar position and situation in past games, using historical shot data [@Analyst2023xG]. A discrepancy between xG and actual goals suggests a team's efficiency or lack thereof in capitalizing on scoring opportunities.
+
+'Progressive Carries' (PrgC) measure movements that advance the ball towards the opponent’s goal by at least 10 yards from its furthest point in the last six passes, or into the penalty area, but excludes any activity in the defending half of the pitch. 'Progressive Passes' (PrgP) are defined as completed passes that propel the ball forward by at least 10 yards from its furthest point in the last six passes or directly into the penalty area, excluding passes originating from the defending 40% of the pitch. These metrics are critical for assessing how effectively a team progresses the ball into areas where they are more likely to score, reflecting strategic offensive movements. (see @fig-average-progressive-plays)
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-average-progressive-plays
+#| fig-cap: Average Progressive Carries and Progressive Passes over the Previous Seasons
+
+# Calculate the average 'Progressive Carries' and 'Progressive Passes' for each team
+average_data <- cleaned_data_17_23 %>%
+  filter(Squad %in% c('Liverpool', 'Arsenal', 'Manchester City')) %>%
+  group_by(Squad) %>%
+  summarise(Avg_PrgC = mean(PrgC), Avg_PrgP = mean(PrgP))
+
+# Reshape data for plotting
+average_data_long <- gather(average_data, key = "Play Type", value = "Count", -Squad)
+
+# Bar graph showing average Progressive Carries and Passes
+ggplot(average_data_long, aes(x = Squad, y = Count, fill = `Play Type`)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(title = "Average Progressive Plays by Team",
+       x = "Team",
+       y = "Average Count",
+       fill = "Play Type") +
+  theme_minimal()
+
+```
+
+# Model {#sec-model}
+```{r fig.width=10, fig.height=5}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-model-justification
+#| fig-cap: Ranking over Previous Seasons for Top Three Team
+library(ggplot2)
+library(gridExtra)
+
+# Calculate the mean and variance of the points and wins
+pts_mean <- mean(cleaned_data_17_23$Pts, na.rm = TRUE)
+pts_variance <- var(cleaned_data_17_23$Pts, na.rm = TRUE)
+
+# Plotting the distribution of the points data
+p1 <- ggplot(cleaned_data_17_23, aes(x = Pts)) +
+  geom_histogram(aes(y = ..density..), binwidth = 1, color = "black", fill = "blue", alpha = 0.7) +
+  stat_function(fun = dgamma, args = list(shape = pts_mean^2 / pts_variance, rate = pts_mean / pts_variance), color = "red", size = 1, linetype = "dashed") +
+  labs(title = "Distribution of Points with Gamma Fit",
+       subtitle = paste("Mean:", round(pts_mean, 2), "Variance:", round(pts_variance, 2)),
+       x = "Points",
+       y = "Density") +
+  theme_minimal()
+
+# Q-Q plot for normality check of points
+p2 <- ggplot(cleaned_data_17_23, aes(sample = Pts)) +
+  stat_qq() +
+  stat_qq_line() +
+  labs(title = "Q-Q Plot for Points Normality Check",
+       x = "Theoretical Quantiles",
+       y = "Sample Quantiles") +
+  theme_minimal()
+
+# Displaying all plots in a grid
+grid.arrange(p1, p2, ncol = 2)
+
+
+```
+
+For the analysis of English Premier League (EPL) team performance, I have developed a Bayesian linear regression model to predict the points (Pts) for teams based on several predictive metrics. The model-building process began with the dataset `cleaned_data_17_23.csv`, which includes team performance data from the 2017 to 2023 seasons. We specifically focused on five predictors: possession percentage (Poss), goals scored (Gls), expected goals (xG), progressive passes (PrgP), and progressive carries (PrgC). The choice of predictors is driven by their relevance in capturing the team's performance capabilities.
+
+@fig-model-justification shows that the choice to employ a Gamma distribution for modeling points in our Bayesian regression analysis appears well-founded. The histogram of points exhibits a skewed pattern, consistent with the type of distribution seen in continuous data that does not fall below zero. The Gamma fit, as illustrated by the red line, adheres closely to the shape and spread of the observed points data, indicating that it captures the inherent variability effectively. This alignment between the empirical data and the theoretical Gamma distribution curve supports its suitability as a model for the points outcome.
+
+The `stan_glm()` function from the `rstanarm` package allows us to incorporate prior knowledge into our Bayesian models systematically. For both points and wins, the predictors' coefficients are subject to normal priors centered at zero, which reflects a baseline assumption of no effect in the absence of data. However, the flexibility of Bayesian modeling is evident in the employment of a broader prior for the intercept, which accounts for more variability and does not constrain the model to a fixed starting point.
+
+The `stan_glm()` function from the `rstanarm` package [@citeR] allows us to incorporate prior knowledge into our Bayesian models systematically. The predictors' coefficients are subject to normal priors centered at zero, which reflects a baseline assumption of no effect in the absence of data. However, the flexibility of Bayesian modeling is evident in the employment of a broader prior for the intercept, which accounts for more variability and does not constrain the model to a fixed starting point.
+
+## Model Equation
+
+The regression equation for predicting the variable `Pts` based on the predictors (`Poss`, `Gls`, `xG`, `PrgP`, `PrgC`) with a log link is:
+
+\begin{equation}
+\log(\mu) = \beta_0 + \beta_1 x_{\text{Poss}} + \beta_2 x_{\text{Gls}} + \beta_3 x_{\text{xG}} + \beta_4 x_{\text{PrgP}} + \beta_5 x_{\text{PrgC}}
+\label{eq:gamma_log}
+\end{equation}
+
+Where:
+
+- $\mu$ is the expected value of `Pts` based on the gamma distribution assumption.
+- $\beta_0$ is the intercept.
+- $\beta_1, \beta_2, \beta_3, \beta_4, \beta_5$ are the coefficients for the predictors `Poss`, `Gls`, `xG`, `PrgP`, and `PrgC` respectively.
+
+## Additional Model Details
+
+1. **Gamma Distribution with Log Link**: The response variable `Pts` is modeled with a Gamma distribution, suggesting that it is always positive and the distribution may be skewed. The log link function means that predictions for `Pts` are made on the log scale and must be exponentiated to obtain predictions on the original scale of `Pts`.
+
+2. **Priors**: The regression coefficients $\beta_1, \beta_2, ..., \beta_5$ and the intercept $\beta_0$ have normal priors with a mean (`location`) of 0 and a standard deviation (`scale`) of 2.5. The `autoscale` parameter adjusts these scales based on the variability of the predictors, which can help in stabilizing the estimation process.
+
+3. **Model Fitting**: The model is fitted using a Bayesian approach with MCMC sampling, specified to run for 4000 iterations with the first 2000 iterations being the warm-up phase. This warm-up phase helps in tuning the sampling algorithm for better convergence in the subsequent sampling.
+
+## Predicting and Interpreting Coefficients
+
+To predict `Pts` for new observations, use the regression equation to compute $\log(\mu)$, then exponentiate this result to convert it back to the original scale:
+
+\begin{equation}
+\hat{p} = e^{\log(\mu)}
+\label{eq:exp_transform}
+\end{equation}
+
+This value represents the mean of the Gamma distribution for the predicted `Pts` given the values of the predictors. The coefficients $\beta$ from the model provide insights into the relationship between each predictor and the log-transformed expected points, indicating how changes in the predictors logarithmically scale the expected points.
+
+Following model estimation, we applied these models to the latest season dataset (`cleaned_data_23_24.csv`) to predict points and wins for the 2023-2024 season. Using the `predict()` function, we calculated predictions for points, subsequently adding these predictions to the dataset to rank the teams. This method enabled us to identify potential league winners based on predicted performance metrics. (see @tbl-prediction-pts)
+```{r tbl.width=10, tbl.height=5}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-prediction-pts
+#| tbl-cap: Predicted Points for the Current Season
+# Create the table with kable and format with kable_styling
+kable(prediction_by_pts, format = "latex", booktabs = TRUE, align = "c")
+```
+
+# Results {#sec-result}
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-model-coefficients-of-pts
+#| tbl-cap: Coefficients from the Model for Points
+model <- model_by_pts 
+coefficients <- broom.mixed::tidy(model, conf.int = TRUE) 
+
+kable(coefficients, format = "latex", booktabs = TRUE, align = "c") %>%   kable_styling(latex_options = "scale_down")
+```
+
+```{r fig.width=10, fig.height=5}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-predicted-points-and-actual-points
+#| fig-cap: Predicted Points and Actual Points
+
+# Load and prepare historical data
+past_season_data <- cleaned_data_17_23
+
+# Predict the 'Pts' using the model
+predicted_pts <- predict(model_by_pts, newdata = cleaned_data_17_23, type = "response")
+
+# Adding predicted points to the test data
+past_season_data$PredictedPts <- predicted_pts
+
+# Assuming data_17_23 includes a 'PredictedPts' column
+ggplot(past_season_data, aes(x = Pts, y = PredictedPts)) +
+  geom_point(aes(color = Squad), size = 3) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linetype = "dashed") +
+  labs(x = "Actual Points",
+       y = "Predicted Points",
+       title = "Predicted vs. Actual Points Scatter Plot",
+       subtitle = "Each point represents a team's season") +
   theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
+  scale_color_viridis_d(name = "Team")
+
 ```
 
-Talk way more about it. 
+@tbl-model-coefficients-of-pts presents the coefficients derived from our Bayesian regression analysis. Each coefficient estimate is accompanied by error bars, representing the 95% confidence interval for these estimates. The significance of these coefficients can be interpreted directly by their impact on the predicted league points. For example, a positive coefficient for goals scored (Gls) indicates a direct and positive influence on the team’s predicted points for the season, reinforcing the importance of offensive strength.
 
+By integrating these coefficients, we can formulate the predictive equation as follows, adhering to the structure outlined in our model equation \ref{eq:gamma_log}, where $\mu$ represents the expected points, and $\beta_0, \beta_1, \beta_2, \beta_3, \beta_4, \beta_5$ are the coefficients for the intercept, possession, goals, expected goals, progressive passes, and progressive carries, respectively.
 
+@fig-predicted-and-actual-standings presents a analysis of predicted versus actual points for Arsenal, Liverpool, and Manchester City over six Premier League seasons, from 17/18 to 22/23. Across the seasons, the model’s predictions align closely with the actual points for Manchester City, indicating a higher predictive accuracy for this team. The red lines, representing the model's predictions, fluctuate in parallel with the actual points denoted by the blue lines, particularly in the 17/18 and 21/22 seasons where the model almost perfectly captures Manchester City's performance.
 
-# Model
+For Liverpool, the model's predictions demonstrate a consistent underestimation of actual points, especially notable in the 18/19 and 19/20 seasons. This suggests that the model may not fully account for factors that led to Liverpool’s actual performance exceeding expectations in those particular seasons. This might indicate that Liverpool might be underestimated for this season and there is still a chance to win Klopp's last season at Liverpool, even though the predicted winner is Mancity.
 
-The goal of our modelling strategy is twofold. Firstly,...
+Arsenal’s plot reveals mixed predictive accuracy. In the 20/21 season, the model’s predictions were optimistic compared to the actual points. Conversely, for the 21/22 season, the model underestimated the team's performance. Such variances underscore potential areas where the model could be refined to better account for variables influencing Arsenal's season-to-season performance.
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
-
-
-# Results
-
-Our results are summarized in @tbl-modelresults.
-
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
-
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
-)
-```
-
-
-
-
-# Discussion
-
-## First discussion point {#sec-first-point}
-
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
-
-## Second discussion point
-
-## Third discussion point
-
-## Weaknesses and next steps
-
-Weaknesses and next steps should also be included.
-
-\newpage
-
-\appendix
-
-# Appendix {-}
-
-
-# Additional data details
-
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
+```{r fig.width=10, fig.height=5}
 #| echo: false
 #| message: false
 #| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
+#| label: fig-predicted-and-actual-standings
+#| fig-cap: Predicted Standings and Actual Standings for Past Seasons
 
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
+# Load and prepare historical data
+past_season_data <- cleaned_data_17_23
 
-posterior_vs_prior(first_model) +
+# Predict the 'Pts' using the model
+predicted_pts <- predict(model_by_pts, newdata = cleaned_data_17_23, type = "response")
+
+# Adding predicted points to the test data
+past_season_data$PredictedPts <- predicted_pts
+
+# Filter data to only include Liverpool, Manchester City, and Arsenal
+filtered_data <- past_season_data %>% 
+  filter(Squad %in% c("Liverpool", "Manchester City", "Arsenal"))
+
+# Reshape data for plotting
+long_data <- filtered_data %>%
+  gather(key = "Type", value = "Points", Pts, PredictedPts)
+
+# Plotting the time series of predicted vs. actual points
+ggplot(long_data, aes(x = season, y = Points, group = Squad, color = Type)) +
+  geom_line() +
+  facet_wrap(~Squad) +
+  labs(x = "Season",
+       y = "Points",
+       title = "Time Series of Predicted vs. Actual Points by Team",
+       subtitle = "Comparison across multiple seasons for Liverpool, Manchester City, and Arsenal") +
   theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
+  scale_color_brewer(palette = "Set1", name = "Data Type")
+
 ```
 
-## Diagnostics
+@fig-predicted-points-and-actual-points illustrates the relationship between the actual and predicted points for various Premier League teams across different seasons. Each dot represents a team’s performance for a season, with the actual points on the x-axis and the predicted points on the y-axis.
 
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
+A positive correlation is evident: teams with higher actual points tend to have higher predicted points, as shown by the concentration of dots along the dashed trend line. This indicates that, generally, the model's predictions are in sync with the actual outcomes. Teams such as Manchester City, which frequently secure points in the higher range, also show high predicted points, suggesting that the model effectively captures their continued success.
 
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
+There are instances, however, where the model's predictions deviate from actual points. Some teams with lower actual points than predicted could indicate overestimation by the model or unexpected underperformances by the teams. Conversely, teams with higher actual points than predicted suggest instances where the model may have underestimated the teams' abilities or failed to anticipate successful outcomes.
 
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
+Clusters of points around the trend line suggest the model’s predictions are relatively accurate, while points further from the line indicate greater discrepancies between predicted and actual outcomes. The spread of points along the y-axis for any given value on the x-axis indicates the variability in the model's accuracy for teams with similar actual points. 
 
-plot(first_model, "trace")
+That said, the model demonstrates a fair degree of predictive accuracy, with a trend line that captures the central tendency of the data. However, some outliers suggest opportunities for refining the model to improve its prediction accuracy for certain teams or under certain conditions.
 
-plot(first_model, "rhat")
-```
+# Discussion {#sec-discussion}
 
+## Implications of Findings for Team Strategy
 
+The analysis of performance metrics such as goals scored (Gls), expected goals (xG), and progressive plays highlights their critical importance in predicting team success in the English Premier League. This understanding offers a tangible pathway for teams to enhance their league standings by focusing on these key areas. For instance, improving a team’s xG might involve strategic recruitment focusing on players known for high-quality shot creation and finishing, coupled with tactical setups that maximize scoring opportunities. Similarly, enhancing progressive passes and carries could involve training sessions dedicated to improving players' ability to break lines and advance the ball under pressure.
+
+Moreover, these metrics can guide more nuanced strategic decisions during matches. For example, if a team is trailing and needs to improve its chance of scoring, managers could adjust their tactics to prioritize forward movements and riskier, more aggressive plays. This could involve pushing full-backs higher up the pitch, employing more direct attacking midfielders, or switching to formations that overload certain areas of the pitch to create mismatches against opponents. Thus, the insights from this analysis not only serve to guide long-term strategies but also adapt real-time decisions that capitalize on the dynamics of a game.
+
+## Comparative Analysis of Model Predictions Across Teams
+
+The varying accuracy of model predictions across different teams like Arsenal, Liverpool, and Manchester City invites a deeper exploration into how specific team characteristics may influence predictive outcomes. For example, Manchester City's consistent tactical setup and high-quality squad depth might make their performance easier to predict compared to a team like Arsenal, which has undergone significant tactical shifts and roster changes in recent seasons. This aspect of the analysis can highlight how stability and consistency in playing style, personnel, and management can lead to more predictable performance outcomes.
+
+Further, the discussion could explore how different tactical approaches impact key performance metrics. For instance, teams that focus on a high-pressing style may have higher progressive metrics but could be more vulnerable defensively, which should be accounted for in the model. Similarly, a team that plays a more conservative, counter-attacking style might outperform its expected goals metrics due to the higher quality of chances created on the break. Understanding these nuances could allow for adjustments to the model that better reflect the strategic approaches of individual teams, leading to more accurate predictions and insights into the effectiveness of different football philosophies.
+
+## Limitations and Future Improvements
+Despite the model's effectiveness in forecasting team points based on key performance indicators, its limitations must be acknowledged to refine future predictive efforts. One significant limitation is the exclusion of variables such as player injuries, transfers, managerial changes, and even weather conditions, which can all drastically affect game outcomes. Future models could benefit from incorporating these factors, perhaps through dynamic adjustments that take into account the probability of key players missing games or the impact of a new manager’s tactics.
+
+Additionally, integrating data from advanced tracking metrics like player work rate, positional heat maps, and psychological factors such as team morale could enhance the model's accuracy. For instance, including the impact of high-profile players returning from injury or new signings integrating into the squad could provide a more accurate reflection of a team’s mid-season potential. This approach requires not only more data collection but also advanced analytical techniques that can handle the increased complexity of the model. As predictive analytics in sports continues to evolve, embracing these complexities will be meaningful in developing more accurate models that can anticipate the unpredictable nature of football.
 
 \newpage
 
